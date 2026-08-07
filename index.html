@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI4Outcome — Times Square</title>
+<style>
+  html,body{margin:0;height:100%;background:#0e1239;font-family:'Avenir','Montserrat',Helvetica,Arial,sans-serif;overflow:hidden}
+  .backdrop{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:url('assets/blur-bg.jpg') center center no-repeat #0e1239;background-size:cover}
+  .stage{position:relative;width:1555px;height:875px;flex:none;overflow:hidden;
+    background:url('assets/city.png') 0 0 no-repeat;background-size:1555px 875px}
+  .ad{position:absolute;display:block;transition:filter 160ms ease-out}
+  .ad img{width:100%;height:100%;display:block}
+  .ad:hover{filter:drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 0 26px rgba(255,255,255,.6))}
+  #ad-ai4o{left:702px;top:33px;width:124px;height:423px}
+  #ad-bwa{left:703px;top:474px;width:134px;height:366px}
+  @media (prefers-reduced-motion:reduce){.ad{transition:none}}
+</style>
+</head>
+<body>
+<div class="backdrop">
+  <div class="stage">
+    <a class="ad" id="ad-ai4o" href="https://ai4outcome.com/" target="_blank" rel="noopener">
+      <img src="assets/ai4o.png" alt="AI4Outcome — Where Intelligence Meets Impact">
+    </a>
+    <a class="ad" id="ad-bwa" href="https://breakfastwithagents.com/" target="_blank" rel="noopener">
+      <img src="assets/bwa.png" alt="Breakfast with Agents">
+    </a>
+  </div>
+</div>
+</body>
+</html>
