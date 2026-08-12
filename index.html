@@ -5,29 +5,290 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI4Outcome — Times Square</title>
 <style>
-  html,body{margin:0;height:100%;background:#0e1239;font-family:'Avenir','Montserrat',Helvetica,Arial,sans-serif;overflow:hidden}
-  .backdrop{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-    background:url('assets/blur-bg.jpg') center center no-repeat #0e1239;background-size:cover}
-  .stage{position:relative;width:1555px;height:875px;flex:none;overflow:hidden;
-    background:url('assets/city.png') 0 0 no-repeat;background-size:1555px 875px}
+  html,body{margin:0;height:100%;background:#0e1239;font-family:'Avenir','Montserrat',Helvetica,Arial,sans-serif}
+  /* Scroll viewport: the plate always covers it (no blank space); any overflow is pannable. */
+  .backdrop{position:fixed;inset:0;overflow:auto;background:#0e1239;
+    cursor:grab;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    scrollbar-width:none}
+  .backdrop::-webkit-scrollbar{display:none}
+  .backdrop.dragging{cursor:grabbing}
+  .sizer{position:relative}
+  .plate{position:absolute;left:0;top:0;width:1555px;height:875px;transform-origin:0 0}
+  .plate video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
   .ad{position:absolute;display:block;transition:filter 160ms ease-out}
   .ad img{width:100%;height:100%;display:block}
-  .ad:hover{filter:drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 0 26px rgba(255,255,255,.6))}
-  #ad-ai4o{left:702px;top:33px;width:124px;height:423px}
-  #ad-bwa{left:703px;top:474px;width:134px;height:366px}
+  .ad:hover{filter:drop-shadow(0 0 5px rgba(255,255,255,.62)) drop-shadow(0 0 13px rgba(255,255,255,.3))}
+  #ad-ai4o{left:719.8px;top:247.1px;width:110px;height:247px}
+  #ad-bwa{left:719px;top:502px;width:117px;height:125px}
+  #ad-rf{left:286px;top:26px;width:110px;height:245px}
+  #ad-pmc{left:29px;top:105px;width:369px;height:492px}
+  #ad-rfs{left:0px;top:112px;width:99px;height:402px}
   @media (prefers-reduced-motion:reduce){.ad{transition:none}}
+
+  /* Flat (non-perspective) preview that follows the cursor on hover */
+  #preview{position:fixed;left:0;top:0;z-index:50;pointer-events:none;opacity:0;
+    transform:translate3d(0,0,0) scale(.97);transform-origin:0 0;
+    transition:opacity 140ms ease-out, transform 140ms ease-out;
+    background:#0e1239;padding:6px;border-radius:14px;
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 18px 48px rgba(14,18,57,.65), 0 2px 8px rgba(14,18,57,.5)}
+  #preview.on{opacity:1;transform:translate3d(0,0,0) scale(1)}
+  #preview img{display:block;border-radius:9px;height:var(--ph,460px);width:auto;max-width:none}
+  @media (prefers-reduced-motion:reduce){#preview{transition:none}}
+
+  /* Loading screen: Times Square marquee bulbs */
+  .stage-hidden{visibility:hidden}
+  #loader{position:fixed;inset:0;z-index:100;background:#04081f;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;
+    transition:opacity 480ms ease-out}
+  #loader.done{opacity:0;pointer-events:none}
+  #loader .word{display:flex;gap:.42em;color:#bfe9ff;font-size:26px;font-weight:700;
+    letter-spacing:.34em;text-shadow:0 0 18px rgba(90,180,255,.6),0 0 46px rgba(0,177,189,.3)}
+  #loader .word span{opacity:.28;transition:opacity 260ms ease-out}
+  #loader .word span.lit{opacity:1}
+  #loader .bulbs{display:flex;align-items:center;gap:11px;padding:0 18px}
+  #loader .bulbs i{display:block;width:15px;height:15px;border-radius:999px;
+    background:#16294a;box-shadow:none;transition:background 200ms ease-out, box-shadow 200ms ease-out}
+  #loader .bulbs i.on{background:#cfeeff;
+    box-shadow:0 0 8px 2px rgba(96,186,255,.9),0 0 26px 6px rgba(0,177,189,.5)}
+  @media (prefers-reduced-motion:reduce){#loader .word span{transition:none}}
+  /* Intro film: plays over everything, then cross-fades into the stage */
+  #intro{position:fixed;inset:0;z-index:200;background:#04081f;
+    transition:opacity 900ms ease-out;}
+  #intro.done{opacity:0;pointer-events:none}
+  #intro video{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
+  #intro .ctrls{position:absolute;right:22px;top:22px;display:flex;gap:10px;z-index:2}
+  #intro button{font:inherit;font-size:11.7px;letter-spacing:.14em;text-transform:uppercase;
+    color:#dbeeff;background:rgba(6,14,38,.55);border:1px solid rgba(191,233,255,.35);
+    border-radius:999px;padding:8px 16px;cursor:pointer;backdrop-filter:blur(6px);
+    transition:background 160ms ease-out, border-color 160ms ease-out}
+  #watchintro{position:fixed;top:22px;right:22px;z-index:60;
+    font-family:inherit;font-size:11.7px;letter-spacing:.14em;text-transform:uppercase;
+    color:#dbeeff;background:rgba(6,14,38,.55);border:1px solid rgba(191,233,255,.35);
+    border-radius:999px;padding:8px 16px;cursor:pointer;backdrop-filter:blur(6px);
+    transition:background 160ms ease-out, border-color 160ms ease-out}
+  #watchintro:hover{background:rgba(15,63,101,.75);border-color:rgba(191,233,255,.7)}
+  #introsound{transition:background 160ms ease-out, border-color 160ms ease-out,
+    transform 420ms cubic-bezier(.22,.61,.36,1), font-size 420ms ease-out, padding 420ms ease-out}
+  #introsound.center{font-size:16px;padding:15px 32px;background:rgba(6,14,38,.72);
+    border-color:rgba(191,233,255,.6);box-shadow:0 0 30px rgba(0,177,189,.35)}
+  #intro button:hover{background:rgba(15,63,101,.75);border-color:rgba(191,233,255,.7)}
 </style>
 </head>
 <body>
-<div class="backdrop">
-  <div class="stage">
-    <a class="ad" id="ad-ai4o" href="https://ai4outcome.com/" target="_blank" rel="noopener">
-      <img src="assets/ai4o.png" alt="AI4Outcome — Where Intelligence Meets Impact">
-    </a>
-    <a class="ad" id="ad-bwa" href="https://breakfastwithagents.com/" target="_blank" rel="noopener">
-      <img src="assets/bwa.png" alt="Breakfast with Agents">
-    </a>
+<div id="intro">
+  <video id="introvid" src="assets/intro.mp4" preload="auto" autoplay playsinline></video>
+  <div class="ctrls">
+    <button id="introsound" type="button">Sound on</button>
+    <button id="introskip" type="button">Skip intro</button>
   </div>
 </div>
+<div id="loader">
+  <div class="word" id="loadword"></div>
+  <div class="bulbs" id="loadbulbs"></div>
+</div>
+<div class="backdrop stage-hidden" id="view">
+  <div class="sizer" id="sizer">
+  <div class="plate" id="plate">
+    <video id="bgvid" src="assets/city-loop.mp4" preload="auto" autoplay loop muted playsinline></video>
+    <a class="ad" id="ad-ai4o" href="https://ai4outcome.com/" target="_blank" rel="noopener" data-preview="assets/ai4o-hover.jpg">
+      <img src="assets/ai4o.png" alt="AI4Outcome — Where Intelligence Meets Impact">
+    </a>
+    <a class="ad" id="ad-bwa" href="https://breakfastwithagents.com/" target="_blank" rel="noopener" data-preview="assets/bwa-hover.jpg" data-preview-scale="0.6">
+      <img src="assets/bwa.png" alt="Breakfast with Agents">
+    </a>
+    <a class="ad" id="ad-pmc" href="https://promovesceo.com/" target="_blank" rel="noopener">
+      <img src="assets/prom-ceo.png" alt="CEO Pro Moves — promovesceo.com">
+    </a>
+    <a class="ad" id="ad-rfs" href="https://reflectivefrontier.com/" target="_blank" rel="noopener" data-preview="assets/rf-strip-hover.jpg" data-preview-scale="0.7">
+      <img src="assets/rf-strip.png" alt="Reflectivefrontier.com">
+    </a>
+    <a class="ad" id="ad-rf" href="https://reflectivefrontier.com/" target="_blank" rel="noopener" data-preview="assets/rf-hover.jpg" data-preview-scale="0.7">
+      <img src="assets/rf.png" alt="Reflective Frontier — A Master Class on Pipe Smoking and conversation about AI">
+    </a>
+  </div>
+  </div>
+  <div id="preview" aria-hidden="true"><img alt=""></div>
+</div>
+<button id="watchintro" type="button">Watch intro</button>
+<script>
+  // Intro film gate: page assets preload underneath; the stage is revealed when the film ends.
+  (function(){
+    var intro=document.getElementById('intro'), v=document.getElementById('introvid'),
+        skip=document.getElementById('introskip'), snd=document.getElementById('introsound');
+    var ended=false;
+    function finish(){
+      if(ended) return; ended=true;
+      intro.classList.add('done');
+      try{ v.pause(); }catch(e){}
+      setTimeout(function(){ if(intro.classList.contains('done')) intro.style.display='none'; }, 940);
+    }
+    var centerT;
+    function centerSound(){
+      snd.classList.add('center');
+      var r=snd.getBoundingClientRect();
+      var dx=(window.innerWidth/2)-(r.left+r.width/2);
+      var dy=(window.innerHeight/2)-(r.top+r.height/2);
+      snd.style.transform='translate('+dx+'px,'+dy+'px)';
+      clearTimeout(centerT);
+      centerT=setTimeout(uncenterSound, 4000);
+    }
+    function uncenterSound(){
+      clearTimeout(centerT);
+      snd.style.transform='translate(0,0)';
+      snd.classList.remove('center');
+    }
+    centerSound();
+    v.muted=true;
+    var p=v.play();
+    if(p&&p.catch) p.catch(function(){ finish(); });
+    snd.addEventListener('click', function(){
+      v.muted=!v.muted;
+      snd.textContent=v.muted?'Sound on':'Mute';
+      uncenterSound();
+      if(!v.muted) v.play();
+    });
+    v.addEventListener('click', function(){ if(v.paused) v.play(); else v.pause(); });
+    skip.addEventListener('click', finish);
+    v.addEventListener('ended', finish);
+    v.addEventListener('error', finish);
+    window.__replayIntro=function(){
+      ended=false;
+      intro.style.display='';
+      intro.offsetHeight;
+      intro.classList.remove('done');
+      try{ v.currentTime=0; }catch(e){}
+      centerSound();
+      v.play();
+    };
+    setTimeout(finish, 90000); // safety net
+  })();
+</script>
+<script>
+  // Preload gate: keep the stage hidden until video + every creative/preview image is ready.
+  (function(){
+    var loader=document.getElementById('loader'), view=document.getElementById('view'),
+        vid=document.getElementById('bgvid'),
+        wordEl=document.getElementById('loadword'), bulbEl=document.getElementById('loadbulbs');
+    var LETTERS='LOADING...'.split(''), BULBS=26;
+    LETTERS.forEach(function(c){ var s=document.createElement('span'); s.textContent=c; wordEl.appendChild(s); });
+    for(var b=0;b<BULBS;b++) bulbEl.appendChild(document.createElement('i'));
+    var letters=wordEl.children, bulbs=bulbEl.children;
+    function fillTo(p){ // p: 0..1
+      var n=Math.round(p*BULBS);
+      for(var i=0;i<BULBS;i++) bulbs[i].classList.toggle('on', i<n);
+      var l=Math.round(p*letters.length);
+      for(var j=0;j<letters.length;j++) letters[j].classList.toggle('lit', j<l);
+    }
+    fillTo(0);
+    var imgs=[], done=0, finished=false;
+    document.querySelectorAll('.ad img').forEach(function(i){ imgs.push(i.getAttribute('src')); });
+    document.querySelectorAll('.ad[data-preview]').forEach(function(a){ imgs.push(a.getAttribute('data-preview')); });
+    var total=imgs.length+1; // +1 for the video
+
+    function tick(){
+      done++;
+      fillTo(done/total);
+      if(done>=total) reveal();
+    }
+    function reveal(){
+      if(finished) return; finished=true;
+      fillTo(1);
+      view.classList.remove('stage-hidden');
+      requestAnimationFrame(function(){
+        loader.classList.add('done');
+        setTimeout(function(){ loader.remove(); }, 460);
+      });
+    }
+    imgs.forEach(function(src){
+      var im=new Image();
+      im.onload=im.onerror=tick;
+      im.src=src;
+    });
+    if(vid.readyState>=3) tick();
+    else {
+      var vdone=false, vt=function(){ if(!vdone){ vdone=true; tick(); } };
+      vid.addEventListener('canplaythrough', vt, {once:true});
+      vid.addEventListener('loadeddata', function(){ setTimeout(vt, 1200); }, {once:true});
+      vid.addEventListener('error', vt, {once:true});
+    }
+    setTimeout(reveal, 15000); // safety net on slow connections
+  })();
+
+  document.getElementById('watchintro').addEventListener('click', function(){
+    if(window.__replayIntro) window.__replayIntro();
+  });
+
+  // Cover-scale the 1555x875 plate: fills the window at any size (no blank space),
+  // and whatever overflows can be scrolled / dragged into view.
+  (function(){
+    var W=1555, H=875;
+    var view=document.getElementById('view'), sizer=document.getElementById('sizer'), plate=document.getElementById('plate');
+    var first=true;
+    function fit(){
+      var fx=view.clientWidth/W, fy=view.clientHeight/H;
+      var s=Math.max(fx,fy);
+      plate.style.transform='scale('+s+')';
+      sizer.style.width=(W*s)+'px';
+      sizer.style.height=(H*s)+'px';
+      // always re-centre on resize, so any crop is split evenly on both sides
+      view.scrollLeft=(W*s-view.clientWidth)/2;
+      view.scrollTop=(H*s-view.clientHeight)/2;
+    }
+    fit();
+    addEventListener('resize',fit);
+    addEventListener('orientationchange',fit);
+
+    // Drag to pan (click-through on ads is preserved: only drags beyond 4px pan)
+    var down=false, sx=0, sy=0, ox=0, oy=0, moved=false;
+    view.addEventListener('pointerdown',function(e){
+      if(e.button!==0) return;
+      down=true; moved=false; sx=e.clientX; sy=e.clientY; ox=view.scrollLeft; oy=view.scrollTop;
+    });
+    addEventListener('pointermove',function(e){
+      if(!down) return;
+      var dx=e.clientX-sx, dy=e.clientY-sy;
+      if(!moved && Math.abs(dx)+Math.abs(dy)>4){ moved=true; view.classList.add('dragging'); }
+      if(moved){ view.scrollLeft=ox-dx; view.scrollTop=oy-dy; }
+    });
+    addEventListener('pointerup',function(e){
+      if(moved){ e.preventDefault(); }
+      down=false; view.classList.remove('dragging');
+    });
+    document.addEventListener('click',function(e){ if(moved){ e.preventDefault(); e.stopPropagation(); } },true);
+  })();
+
+  // Hover preview: shows the flat, perspective-free creative next to the cursor.
+  (function(){
+    var box=document.getElementById('preview'), img=box.querySelector('img');
+    var GAP=18, PAD=12, current=null;
+
+    function place(e){
+      var w=box.offsetWidth, h=box.offsetHeight;
+      var x=e.clientX+GAP, y=e.clientY+GAP;
+      if(x+w>innerWidth-PAD)  x=e.clientX-GAP-w;
+      if(y+h>innerHeight-PAD) y=innerHeight-PAD-h;
+      if(x<PAD) x=PAD;
+      if(y<PAD) y=PAD;
+      box.style.transform='translate3d('+x+'px,'+y+'px,0) scale(1)';
+    }
+
+    document.querySelectorAll('.ad').forEach(function(ad){
+      var src=ad.getAttribute('data-preview');
+      if(!src) return; // no preview for this ad
+      ad.addEventListener('mouseenter',function(e){
+        current=ad;
+        if(img.getAttribute('src')!==src) img.setAttribute('src',src);
+        // preview height: 62% of viewport, capped so it never dominates the screen
+        var k=parseFloat(ad.getAttribute('data-preview-scale'))||1;
+        box.style.setProperty('--ph', Math.round(Math.min(Math.round(innerHeight*0.31), 280)*k)+'px');
+        place(e);
+        box.classList.add('on');
+      });
+      ad.addEventListener('mousemove',function(e){ if(current===ad) place(e); });
+      ad.addEventListener('mouseleave',function(){ current=null; box.classList.remove('on'); });
+    });
+  })();
+</script>
 </body>
 </html>
