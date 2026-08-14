@@ -19,10 +19,23 @@
   .ad img{width:100%;height:100%;display:block}
   .ad:hover{filter:drop-shadow(0 0 5px rgba(255,255,255,.62)) drop-shadow(0 0 13px rgba(255,255,255,.3))}
   #ad-ai4o{left:719.8px;top:247.1px;width:110px;height:247px}
-  #ad-bwa{left:719px;top:502px;width:117px;height:125px}
-  #ad-rf{left:286px;top:26px;width:110px;height:245px}
-  #ad-pmc{left:29px;top:105px;width:369px;height:492px}
-  #ad-rfs{left:0px;top:112px;width:99px;height:402px}
+  #ad-bwa{left:717px;top:504px;width:117px;height:125px}
+  #ad-rf{left:275px;top:18px;width:112.2px;height:249.9px}
+  #ad-pmc{left:14px;top:104px;width:369px;height:492px}
+  #ad-rfs{left:-12px;top:106px;width:99px;height:402px}
+  #ad-pcdo{left:1179px;top:492px;width:394.5px;height:165px}
+  #ad-t10b{left:1173px;top:91px;width:396.4px;height:455.9px}
+  #ad-da{left:1042px;top:609px;width:98.8px;height:110.2px}
+  #ad-mbi{left:1033px;top:348px;width:99.8px;height:267.5px}
+  #ad-a4cm{left:963px;top:450px;width:65.3px;height:230px}
+  #ad-bws{left:706px;top:666px;width:135px;height:43.7px}
+  #ad-t10{left:573px;top:590px;width:24.8px;height:116.1px}
+  #ad-phro{left:532px;top:466px;width:47.7px;height:190.3px}
+  #ad-pcfo{left:507px;top:637px;width:37.4px;height:65.5px}
+  #ad-pcxo{left:409px;top:600px;width:94.1px;height:100.4px}
+  #ad-a4m{left:436px;top:323px;width:94.5px;height:284.5px}
+  #ad-pcio{left:483px;top:170px;width:53.6px;height:210px}
+  #ad-a4b{left:-22px;top:582px;width:377px;height:102px}
   @media (prefers-reduced-motion:reduce){.ad{transition:none}}
 
   /* Flat (non-perspective) preview that follows the cursor on hover */
@@ -54,8 +67,13 @@
   @media (prefers-reduced-motion:reduce){#loader .word span{transition:none}}
   /* Intro film: plays over everything, then cross-fades into the stage */
   #intro{position:fixed;inset:0;z-index:200;background:#04081f;
-    transition:opacity 900ms ease-out;}
-  #intro.done{opacity:0;pointer-events:none}
+    transition:opacity 1500ms cubic-bezier(.33,0,.2,1), filter 1500ms cubic-bezier(.33,0,.2,1),
+      transform 1700ms cubic-bezier(.22,.61,.36,1);
+    will-change:opacity,filter,transform}
+  #intro.done{opacity:0;pointer-events:none;filter:blur(14px) brightness(1.06);transform:scale(1.05)}
+  #intro.done .ctrls{opacity:0;transition:opacity 320ms ease-out}
+  @media (prefers-reduced-motion:reduce){#intro{transition:opacity 300ms linear}
+    #intro.done{filter:none;transform:none}}
   #intro video{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
   #intro .ctrls{position:absolute;right:22px;top:22px;display:flex;gap:10px;z-index:2}
   #intro button{font:inherit;font-size:11.7px;letter-spacing:.14em;text-transform:uppercase;
@@ -68,16 +86,59 @@
     border-radius:999px;padding:8px 16px;cursor:pointer;backdrop-filter:blur(6px);
     transition:background 160ms ease-out, border-color 160ms ease-out}
   #watchintro:hover{background:rgba(15,63,101,.75);border-color:rgba(191,233,255,.7)}
+  #contactbtn{position:fixed;bottom:22px;right:22px;z-index:60;
+    font-family:inherit;font-size:11.7px;letter-spacing:.14em;text-transform:uppercase;
+    color:#0e1239;background:#fff;border:1px solid #fff;
+    border-radius:999px;padding:8px 16px;cursor:pointer;backdrop-filter:blur(6px);
+    transition:background 160ms ease-out, border-color 160ms ease-out, color 160ms ease-out}
+  #contactbtn:hover{background:#ea4224;border-color:#ea4224;color:#fff}
+  #cform{position:fixed;inset:0;z-index:85;display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    opacity:0;pointer-events:none;transition:opacity 420ms cubic-bezier(.22,.61,.36,1)}
+  #cform.on{opacity:1;pointer-events:auto}
+  #cformcard{position:relative;width:min(440px,90vw);background:#fff;border-radius:14px;
+    padding:28px 26px 24px;box-shadow:0 24px 64px rgba(14,18,57,.5);
+    transform:scale(.94) translateY(14px);opacity:0;
+    transition:transform 520ms cubic-bezier(.16,.84,.28,1), opacity 380ms ease-out}
+  #cform.on #cformcard{transform:scale(1) translateY(0);opacity:1}
+  #cformcard h3{margin:0 0 4px;font-size:22px;font-weight:800;color:#0e1239;letter-spacing:-.01em}
+  #cformcard p.sub{margin:0 0 18px;font-size:13px;line-height:1.6;color:#5b6079}
+  #cformcard label{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    font-weight:700;color:#0f3f65;margin:0 0 6px}
+  #cformcard .fields{display:grid;gap:14px}
+  #cformcard input,#cformcard textarea{width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;
+    color:#0e1239;background:#f7f8fb;border:1px solid #dcdfe8;border-radius:10px;padding:10px 12px;
+    transition:border-color 160ms ease-out}
+  #cformcard input:focus,#cformcard textarea:focus{outline:0;border-color:#0f3f65}
+  #cformcard textarea{resize:vertical;min-height:84px;line-height:1.5}
+  #cformcard .actions{display:flex;gap:10px;align-items:center;margin-top:20px}
+  #cformsubmit{font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.02em;color:#fff;
+    background:#ea4224;border:0;border-radius:10px;padding:11px 22px;cursor:pointer;
+    transition:transform 160ms ease-out, box-shadow 160ms ease-out}
+  #cformsubmit:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(234,66,36,.35)}
+  #cformstatus{font-size:12.5px;color:#0f3f65}
+  #cformclose{position:absolute;top:-14px;right:-14px;width:36px;height:36px;border:0;cursor:pointer;
+    border-radius:999px;background:#ea4224;color:#fff;font:400 22px/1 system-ui,sans-serif;
+    box-shadow:0 6px 18px rgba(0,0,0,.4)}
+  @media (prefers-reduced-motion:reduce){#cform,#cformcard{transition:none}}
   #introsound{transition:background 160ms ease-out, border-color 160ms ease-out,
     transform 420ms cubic-bezier(.22,.61,.36,1), font-size 420ms ease-out, padding 420ms ease-out}
   #introsound.center{font-size:16px;padding:15px 32px;background:rgba(6,14,38,.72);
     border-color:rgba(191,233,255,.6);box-shadow:0 0 30px rgba(0,177,189,.35)}
   #intro button:hover{background:rgba(15,63,101,.75);border-color:rgba(191,233,255,.7)}
+  /* Buffering screen: holds the first paint while intro + assets stream in */
+  #wait{position:fixed;inset:0;z-index:300;background:#04081f;
+    transition:opacity 600ms ease-out}
+  #wait.done{opacity:0;pointer-events:none}
+  #wait video{width:100%;height:100%;object-fit:cover;display:block}
 </style>
 </head>
 <body>
+<div id="wait">
+  <video id="waitvid" src="assets/waiting.mp4" preload="auto" autoplay loop muted playsinline></video>
+</div>
 <div id="intro">
-  <video id="introvid" src="assets/intro.mp4" preload="auto" autoplay playsinline></video>
+  <video id="introvid" src="assets/intro.mp4" preload="auto" playsinline></video>
   <div class="ctrls">
     <button id="introsound" type="button">Sound on</button>
     <button id="introskip" type="button">Skip intro</button>
@@ -103,6 +164,45 @@
     <a class="ad" id="ad-rfs" href="https://reflectivefrontier.com/" target="_blank" rel="noopener" data-preview="assets/rf-strip-hover.jpg" data-preview-scale="0.7">
       <img src="assets/rf-strip.png" alt="Reflectivefrontier.com">
     </a>
+    <a class="ad" id="ad-pcdo" href="https://promovescdo.com/" target="_blank" rel="noopener">
+      <img src="assets/pmcdo.png" alt="promovescdo.com">
+    </a>
+    <a class="ad" id="ad-t10b" href="https://top10enterpriseai.com/" target="_blank" rel="noopener">
+      <img src="assets/top10ai.png" alt="top10enterpriseai.com">
+    </a>
+    <a class="ad" id="ad-da" href="#" data-modal="assets/coming-soon.svg" data-preview="assets/da-hover.jpg" data-preview-scale="0.7">
+      <img src="assets/da.png" alt="Digital Assistant">
+    </a>
+    <a class="ad" id="ad-mbi" href="https://modernizebi.com/" target="_blank" rel="noopener" data-preview="assets/mbi-hover.jpg" data-preview-scale="0.7">
+      <img src="assets/mbi.png" alt="ModernizeBI">
+    </a>
+    <a class="ad" id="ad-a4cm" href="https://aiagents4capitalmarkets.com/" target="_blank" rel="noopener" data-preview="assets/ai4cm-hover.jpg" data-preview-scale="0.7">
+      <img src="assets/ai4cm.png" alt="aiagents4capitalmarkets.com">
+    </a>
+    <a class="ad" id="ad-bws" href="https://breakfastwithagents.com/" target="_blank" rel="noopener">
+      <img src="assets/bwastrip.png" alt="Breakfastwithagents.com">
+    </a>
+    <a class="ad" id="ad-t10" href="https://top10enterpriseai.com/" target="_blank" rel="noopener" data-preview="assets/t10ai-hover.jpg" data-preview-scale="0.7">
+      <img src="assets/t10ai.png" alt="Top10enterpriseai.com">
+    </a>
+    <a class="ad" id="ad-phro" href="https://promoveschro.com/" data-modal="assets/coming-soon.svg" data-preview="assets/pmchro-hover.jpg" data-preview-scale="0.7">
+      <img src="assets/pmchro.png" alt="promoveschro.com">
+    </a>
+    <a class="ad" id="ad-pcfo" href="https://promovescfo.com/" data-modal="assets/coming-soon.svg" data-preview="assets/pmcfo-hover.jpg" data-preview-scale="0.35">
+      <img src="assets/pmcfo.png" alt="PROMOVESCFO.COM">
+    </a>
+    <a class="ad" id="ad-pcxo" href="https://promovescxo.com/" data-modal="assets/coming-soon.svg" data-preview="assets/pmcxo-hover.jpg" data-preview-scale="0.42">
+      <img src="assets/pmcxo.png" alt="PROMOVESCXO.COM">
+    </a>
+    <a class="ad" id="ad-a4m" href="https://aiagents4manufacturing.com/" target="_blank" rel="noopener" data-preview="assets/aia4m-hover.jpg" data-preview-scale="0.84">
+      <img src="assets/aia4m.png" alt="AIAgents4Manufacturing — AI Agents: Driving Precision and Efficiency in Manufacturing">
+    </a>
+    <a class="ad" id="ad-pcio" href="https://promovescio.com/" data-modal="assets/coming-soon.svg" data-preview="assets/pmcio-hover.jpg" data-preview-scale="0.7">
+      <img src="assets/pmcio.png" alt="promovescio.com">
+    </a>
+    <a class="ad" id="ad-a4b" href="https://analytics4banks.com/" target="_blank" rel="noopener">
+      <img src="assets/a4b.png" alt="Analytics4banks.com">
+    </a>
     <a class="ad" id="ad-rf" href="https://reflectivefrontier.com/" target="_blank" rel="noopener" data-preview="assets/rf-hover.jpg" data-preview-scale="0.7">
       <img src="assets/rf.png" alt="Reflective Frontier — A Master Class on Pipe Smoking and conversation about AI">
     </a>
@@ -110,7 +210,91 @@
   </div>
   <div id="preview" aria-hidden="true"><img alt=""></div>
 </div>
+<div id="modal" aria-hidden="true"><div id="modalcard"><img id="modalimg" alt="Coming soon"><button id="modalclose" type="button" aria-label="Close">&times;</button></div></div>
+<style>
+  #modal{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    opacity:0;pointer-events:none;
+    transition:opacity 420ms cubic-bezier(.22,.61,.36,1), backdrop-filter 420ms cubic-bezier(.22,.61,.36,1);
+    will-change:opacity}
+  #modal.on{opacity:1;pointer-events:auto}
+  #modalcard{position:relative;transform:scale(.94) translateY(14px);opacity:0;
+    transition:transform 520ms cubic-bezier(.16,.84,.28,1), opacity 380ms cubic-bezier(.22,.61,.36,1);
+    will-change:transform,opacity}
+  #modal.on #modalcard{transform:scale(1) translateY(0);opacity:1}
+  @media (prefers-reduced-motion:reduce){#modal,#modalcard{transition:none}}
+  #modalimg{display:block;width:444px;max-width:86vw;height:auto;filter:brightness(0) invert(1)}
+  #modalclose{position:absolute;top:-14px;right:-14px;width:36px;height:36px;border:0;cursor:pointer;
+    border-radius:999px;background:#ea4224;color:#fff;font:400 22px/1 system-ui,sans-serif;
+    box-shadow:0 6px 18px rgba(0,0,0,.4)}
+</style>
+<script>
+  (function(){
+    var m=document.getElementById('modal'), mi=document.getElementById('modalimg');
+    function open(src){ if(mi.getAttribute('src')!==src) mi.setAttribute('src',src);
+      m.classList.add('on'); m.setAttribute('aria-hidden','false'); }
+    function close(){ m.classList.remove('on'); m.setAttribute('aria-hidden','true'); }
+    document.querySelectorAll('.ad[data-modal]').forEach(function(a){
+      a.addEventListener('click',function(e){ e.preventDefault(); open(a.getAttribute('data-modal')); });
+    });
+    m.addEventListener('click',close);
+    addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  })();
+</script>
 <button id="watchintro" type="button">Watch intro</button>
+<button id="contactbtn" type="button">Contact us</button>
+<div id="cform" aria-hidden="true">
+  <div id="cformcard">
+    <button id="cformclose" type="button" aria-label="Close">&times;</button>
+    <h3>Let's talk</h3>
+    <p class="sub">Share a few details and our team will get back to you.</p>
+    <form id="cformel" novalidate>
+      <div class="fields">
+        <div><label for="cf-name">Name</label><input id="cf-name" name="name" type="text" required autocomplete="name"></div>
+        <div><label for="cf-email">Work email</label><input id="cf-email" name="email" type="email" required autocomplete="email"></div>
+        <div><label for="cf-company">Company</label><input id="cf-company" name="company" type="text" autocomplete="organization"></div>
+        <div><label for="cf-msg">Message</label><textarea id="cf-msg" name="message" rows="3"></textarea></div>
+      </div>
+      <div class="actions">
+        <button id="cformsubmit" type="submit">Send message</button>
+        <span id="cformstatus"></span>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  (function(){
+    var TO='contact@kriosprime.com';
+    var w=document.getElementById('cform'), f=document.getElementById('cformel'),
+        st=document.getElementById('cformstatus'), btn=document.getElementById('cformsubmit');
+    function open(){ w.classList.add('on'); w.setAttribute('aria-hidden','false');
+      setTimeout(function(){ document.getElementById('cf-name').focus(); },260); }
+    function close(){ w.classList.remove('on'); w.setAttribute('aria-hidden','true'); }
+    document.getElementById('contactbtn').addEventListener('click',open);
+    document.getElementById('cformclose').addEventListener('click',close);
+    w.addEventListener('click',function(e){ if(e.target===w) close(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape' && w.classList.contains('on')) close(); });
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      if(!f.name.value.trim() || !f.email.value.trim()){ st.textContent='Name and email are required.'; return; }
+      st.textContent='Sending\u2026'; btn.disabled=true;
+      var d=new FormData();
+      d.append('name',f.name.value); d.append('email',f.email.value);
+      d.append('company',f.company.value); d.append('message',f.message.value);
+      d.append('_subject','KriosPrime enquiry \u2014 '+f.name.value);
+      d.append('_captcha','false'); d.append('_template','table');
+      fetch('https://formsubmit.co/ajax/'+TO,{method:'POST',body:d})
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(){ st.textContent='Thanks \u2014 we\u2019ll be in touch.'; f.reset();
+          setTimeout(function(){ close(); st.textContent=''; btn.disabled=false; },1600); })
+        .catch(function(){
+          st.textContent='Opening your email app\u2026'; btn.disabled=false;
+          var body='Name: '+f.name.value+'\nEmail: '+f.email.value+'\nCompany: '+f.company.value+'\n\n'+f.message.value;
+          window.location.href='mailto:'+TO+'?subject='+encodeURIComponent('KriosPrime enquiry')+'&body='+encodeURIComponent(body);
+        });
+    });
+  })();
+</script>
 <script>
   // Intro film gate: page assets preload underneath; the stage is revealed when the film ends.
   (function(){
@@ -121,7 +305,7 @@
       if(ended) return; ended=true;
       intro.classList.add('done');
       try{ v.pause(); }catch(e){}
-      setTimeout(function(){ if(intro.classList.contains('done')) intro.style.display='none'; }, 940);
+      setTimeout(function(){ if(intro.classList.contains('done')) intro.style.display='none'; }, 1780);
     }
     var centerT;
     function centerSound(){
@@ -138,10 +322,28 @@
       snd.style.transform='translate(0,0)';
       snd.classList.remove('center');
     }
-    centerSound();
     v.muted=true;
-    var p=v.play();
-    if(p&&p.catch) p.catch(function(){ finish(); });
+
+    // Buffer gate: loop the waiting film until the intro can play through.
+    var wait=document.getElementById('wait'), wv=document.getElementById('waitvid'), started=false;
+    function startIntro(){
+      if(started) return; started=true;
+      clearTimeout(waitCap);
+      centerSound();
+      var p=v.play();
+      if(p&&p.catch) p.catch(function(){ finish(); });
+      wait.classList.add('done');
+      setTimeout(function(){ wait.remove(); }, 640);
+    }
+    var waitCap=setTimeout(startIntro, 20000); // never strand the visitor
+    if(v.readyState>=4) startIntro();
+    v.addEventListener('canplaythrough', startIntro);
+    v.addEventListener('progress', function(){
+      // enough of a head start (8s buffered) is as good as fully ready
+      if(v.buffered.length && v.buffered.end(0)>=8) startIntro();
+    });
+    var wp=wv.play();
+    if(wp&&wp.catch) wp.catch(function(){});
     snd.addEventListener('click', function(){
       v.muted=!v.muted;
       snd.textContent=v.muted?'Sound on':'Mute';
@@ -265,8 +467,10 @@
 
     function place(e){
       var w=box.offsetWidth, h=box.offsetHeight;
-      var x=e.clientX+GAP, y=e.clientY+GAP;
-      if(x+w>innerWidth-PAD)  x=e.clientX-GAP-w;
+      var leftSide = e.clientX > innerWidth*0.5;
+      var x = leftSide ? e.clientX-GAP-w : e.clientX+GAP, y=e.clientY+GAP;
+      if(!leftSide && x+w>innerWidth-PAD)  x=e.clientX-GAP-w;
+      if(leftSide && x<PAD) x=e.clientX+GAP;
       if(y+h>innerHeight-PAD) y=innerHeight-PAD-h;
       if(x<PAD) x=PAD;
       if(y<PAD) y=PAD;
