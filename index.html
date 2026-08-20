@@ -143,6 +143,19 @@
   #introsound.center{font-size:16px;padding:15px 32px;background:rgba(6,14,38,.72);
     border-color:rgba(191,233,255,.6);box-shadow:0 0 30px rgba(0,177,189,.35)}
   #intro button:hover{background:rgba(15,63,101,.75);border-color:rgba(191,233,255,.7)}
+  #introtime{position:absolute;left:42px;bottom:52px;z-index:2;display:flex;align-items:center;gap:10px;
+    font-family:inherit;font-size:11.7px;letter-spacing:.14em;color:#dbeeff;
+    background:rgba(6,14,38,.55);border:1px solid rgba(191,233,255,.35);
+    border-radius:999px;padding:8px 16px;backdrop-filter:blur(6px);
+    font-variant-numeric:tabular-nums}
+  #introtime button{font:inherit;font-size:11.7px;letter-spacing:.14em;text-transform:uppercase;
+    color:#dbeeff;background:rgba(191,233,255,.1);border:1px solid rgba(191,233,255,.35);
+    border-radius:999px;padding:4px 12px;cursor:pointer;
+    transition:background 160ms ease-out, border-color 160ms ease-out}
+  #introtime button:hover{background:rgba(15,63,101,.85);border-color:rgba(191,233,255,.7)}
+  #introtime .bar{width:74px;height:2px;background:rgba(191,233,255,.28);border-radius:2px;overflow:hidden}
+  #introtime .bar i{display:block;height:100%;width:0;background:#60baff;
+    box-shadow:0 0 8px rgba(0,177,189,.7);transition:width 220ms linear}
   /* Buffering screen: holds the first paint while intro + assets stream in */
   #wait{position:fixed;inset:0;z-index:300;background:#04081f;
     transition:opacity 600ms ease-out}
@@ -160,6 +173,7 @@
     <button id="introsound" type="button">Sound on</button>
     <button id="introskip" type="button">Skip intro</button>
   </div>
+  <div id="introtime"><span id="introtimet">0:00 / 0:00</span><span class="bar"><i id="introtimeb"></i></span><button id="intromute" type="button">Unmute</button></div>
 </div>
 <div id="loader">
   <div class="word" id="loadword"></div>
@@ -232,7 +246,7 @@
     <a class="ad" id="ad-mbi" href="https://modernizebi.com/" target="_blank" rel="noopener" data-preview="assets/mbi-hover.jpg" data-preview-scale="0.7">
       <img src="assets/mbi.png" alt="ModernizeBI">
     </a>
-    <a class="ad" id="ad-a4cm" href="https://aiagents4capitalmarkets.com/" target="_blank" rel="noopener" data-preview="assets/ai4cm-hover.jpg" data-preview-scale="0.7">
+    <a class="ad" id="ad-a4cm" href="https://aiagents4capitalmarkets.com/" target="_blank" rel="noopener" data-preview="assets/ai4cm-hover.jpg" data-preview-scale="0.91">
       <img src="assets/ai4cm.png" alt="aiagents4capitalmarkets.com">
     </a>
     <a class="ad" id="ad-bws" href="https://breakfastwithagents.com/" target="_blank" rel="noopener">
@@ -320,7 +334,7 @@
 </div>
 <script>
   (function(){
-    var TO='contact@kriosprime.com';
+    var TO='Niv@ai4outcome.com';
     var w=document.getElementById('cform'), f=document.getElementById('cformel'),
         st=document.getElementById('cformstatus'), btn=document.getElementById('cformsubmit');
     function open(){ w.classList.add('on'); w.setAttribute('aria-hidden','false');
@@ -407,6 +421,22 @@
       if(!v.muted) v.play();
     });
     v.addEventListener('click', function(){ if(v.paused) v.play(); else v.pause(); });
+    (function(){
+      var t=document.getElementById('introtimet'), bar=document.getElementById('introtimeb');
+      function fmt(s){ s=Math.max(0,Math.floor(s||0)); return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2); }
+      function tick(){
+        var d=isFinite(v.duration)?v.duration:0;
+        t.textContent=fmt(v.currentTime)+' / '+fmt(d);
+        bar.style.width=(d?Math.min(100,v.currentTime/d*100):0)+'%';
+      }
+      ['timeupdate','loadedmetadata','seeked','play'].forEach(function(ev){ v.addEventListener(ev,tick); });
+      tick();
+      var mb=document.getElementById('intromute');
+      function syncMute(){ mb.textContent = v.muted ? 'Unmute' : 'Mute'; }
+      mb.addEventListener('click', function(){ v.muted=!v.muted; if(!v.muted) uncenterSound(); syncMute(); });
+      v.addEventListener('volumechange', syncMute);
+      syncMute();
+    })();
     skip.addEventListener('click', finish);
     v.addEventListener('ended', finish);
     v.addEventListener('error', finish);
